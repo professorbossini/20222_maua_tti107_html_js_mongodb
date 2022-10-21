@@ -2,14 +2,15 @@
   "name": "projeto_filmes_fullstack",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "backend.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon backend.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.18.2"
   },
   "devDependencies": {

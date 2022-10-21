@@ -1,7 +1,9 @@
 const express = require('express')
+const cors = require('cors')
 const app = express()
 app.use(express.json())
-
+//aqui vamos aplicar um "middleware" que "libera" o CORS
+app.use(cors())
 let filmes = [
   {
     titulo: "Forrest Gump - O Contador de Histórias",
