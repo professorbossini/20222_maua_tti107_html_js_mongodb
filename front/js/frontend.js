@@ -4,14 +4,17 @@ const filmesEndpoint = "/filmes"
 
 // async/await
 async function obterFilmes(){
-  // const URLCompleta = f'{2 + 2}'
-  // string template
-  const URLCompleta = `${protocolo}://${baseURL}${filmesEndpoint}`
-  // data
-  //aqui acontece um erro "CORS"
-  //Cross Resource Origin Sharing
+ const URLCompleta = `${protocolo}://${baseURL}${filmesEndpoint}`
   const filmes = (await axios.get(URLCompleta)).data
-  //agora vamos manipular a árvore DOM
-  //(Document Object Model)
-  console.log(document)
+  let tabela = document.querySelector('.filmes')
+  //camel case
+  let corpoDaTabela = tabela.getElementsByTagName('tbody')[0]
+  //estrutura de repetição
+  for (let filme of filmes){
+    let linha = corpoDaTabela.insertRow()
+    let celulaTitulo = linha.insertCell(0)
+    celulaTitulo.innerHTML = filme.titulo
+    let celulaSinopse = linha.insertCell(1)
+    celulaSinopse.innerHTML = filme.sinopse
+  }
 }

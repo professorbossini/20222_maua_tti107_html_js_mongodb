@@ -8,6 +8,36 @@
   </head>
   <body onload="obterFilmes()">
     <div class="container mt-5">
+
+      <!-- .row.justify-content-center -->
+      <div class="row justify-content-center">
+        
+        <div class="col-md-8 col-lg-4">
+          <!-- .form-floating.mb-3 -->
+          <div class="form-floating mb-3">
+            <!-- input[type=text].form-control#tituloInput[placeholder="Título do filme"] -->
+            <input type="text" class="form-control" id="tituloInput" placeholder="Título do filme">
+            <!-- label[for=tituloInput]{Título do filme} -->
+            <label for="tituloInput">Título do filme</label>
+          </div>
+        </div>
+
+        <div class="col-md-8 col-lg-4">
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="sinopseInput" placeholder="Sinopse do filme">
+            <label for="sinopseInput">Sinopse do filme</label>
+          </div>
+        </div>
+      </div>
+      
+      <!-- .row.justify-content-center -->
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <!-- button.btn.btn-outline-primary{Cadastrar} -->
+          <button class="btn btn-outline-primary w-100">Cadastrar</button>
+        </div>
+      </div>
+
       <div class="row justify-content-center">
         <div class="col-md-8">
           <!-- table.table.table-striped.table-hover.text-center.filmes   -->
