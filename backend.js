@@ -1,19 +1,22 @@
+//mongodb+srv://professorbossini:<password>@cluster0.wttmkyk.mongodb.net/?retryWrites=true&w=majority
 const express = require('express')
 const cors = require('cors')
+const mongoose = require ('mongoose')
 const app = express()
 app.use(express.json())
 //aqui vamos aplicar um "middleware" que "libera" o CORS
 app.use(cors())
-let filmes = [
-  {
-    titulo: "Forrest Gump - O Contador de Histórias",
-    sinopse: "Quarenta anos da história dos Estados Unidos, vistos pelos olhos de Forrest Gump (Tom Hanks),um rapaz com QI abaixo da média e boas intenções."
-  },
-  {
-    titulo: "Um Sonho de Liberdade",
-    sinopse: "Em 1946, Andy Dufresne (Tim Robbins), um jovem e bem sucedido banqueiro, tem a sua vida radicalmente modificada ao ser condenado por um crime que nunca cometeu, o homicídio de sua esposa e do amante dela"
-  }
-]
+
+//descrever o que é um filme usando a mongoose
+const Filme = mongoose.model('Filme', mongoose.Schema({
+  titulo: {type: String},
+  sinopse: {type: String}
+}))
+
+//essa função vai ser usada para estabelecer uma conexão entre o Back End (NodeJS) e o MongoDB
+async function conectarAoMongoDB(){
+  await mongoose.connect('mongodb+srv://professorbossini:professorbossini@cluster0.wttmkyk.mongodb.net/?retryWrites=true&w=majority')
+}
 
 //endpoint
 //localhost:3000/hey
@@ -24,13 +27,16 @@ app.get('/hey', (req, res) => {
 })
 //a
 //localhost:3000/filmes
-app.get('/filmes', (req, res) => {
+app.get('/filmes', async (req, res) => {
+  //1. pegar a coleção de filmes que existe na base gerenciada pelo MongoDB
+  const filmes = await Filme.find()
+  //2. devolver a coleção para o cliente
   res.json(filmes)
-}) //() => {} isso é uma arrow function
+}) 
 
 //endpoint que atenda requisições feitas como "post" e não get, no padrão
 //localhost:3000/filmes
-app.post('/filmes', (req, res) => {
+app.post('/filmes', async (req, res) => {
   //obter o titulo que se encontra na requisição
   let titulo = req.body.titulo
 
@@ -39,10 +45,14 @@ app.post('/filmes', (req, res) => {
 
   //construir um objeto JSON que representa esse novo filme
   // let filme = {titulo: titulo, sinopse: sinopse}
-  let filme = {titulo, sinopse}
+  // let filme = {titulo, sinopse}
+  //construir um objeto Filme usando o modelo da mongoose
+  const filme = new Filme ({titulo, sinopse})
 
   //adicionar o objeto JSON à coleção de filmes
-  filmes.push(filme)
+  // filmes.push(filme)
+  await filme.save()
+  const filmes = await Filme.find()
 
   //devolver a coleção de filmes atualizada para o cliente
   res.json(filmes)  
@@ -50,4 +60,12 @@ app.post('/filmes', (req, res) => {
 })
 
 //127.0.0.1:3000
-app.listen(3000, () => console.log("servidor no ar"))
+app.listen(3000, () => {
+  try{
+    conectarAoMongoDB()
+    console.log('servidor no ar')
+  }
+  catch(erro){
+    console.log("Erro", erro)   
+  }
+})
