@@ -1,7 +1,9 @@
 //mongodb+srv://professorbossini:<password>@cluster0.wttmkyk.mongodb.net/?retryWrites=true&w=majority
-const express = require('express')
+const bcrypt= require ('bcrypt')
 const cors = require('cors')
+const express = require('express')
 const mongoose = require ('mongoose')
+const uniqueValidator = require ('mongoose-unique-validator')
 const app = express()
 app.use(express.json())
 //aqui vamos aplicar um "middleware" que "libera" o CORS
@@ -12,6 +14,15 @@ const Filme = mongoose.model('Filme', mongoose.Schema({
   titulo: {type: String},
   sinopse: {type: String}
 }))
+
+const usuarioSchema = mongoose.Schema({
+  login: {type: String, required: true, unique: true},
+  password: {type: String, required: true}
+})
+
+usuarioSchema.plugin(uniqueValidator)
+
+const Usuario = mongoose.model('Usuario', usuarioSchema)
 
 //essa função vai ser usada para estabelecer uma conexão entre o Back End (NodeJS) e o MongoDB
 async function conectarAoMongoDB(){
@@ -57,6 +68,30 @@ app.post('/filmes', async (req, res) => {
   //devolver a coleção de filmes atualizada para o cliente
   res.json(filmes)  
 
+})
+
+//localhost:3000/signup
+app.post('/signup', async (req, res) => {
+  try{
+    //1. pegar login e senha da requisição
+    // const login = req.body.login
+    // const password = req.body.password
+    // operador de desestruturação do Javascript
+    const { login, password } = req.body
+    //2. construir um objeto do tipo Usuario usando o modelo da mongoose
+    const criptografada = await bcrypt.hash(password, 10)
+    console.log(criptografada)
+    const usuario = new Usuario({login, password: criptografada})
+    //3. cadastrar o usuário na base
+    const respMongo = await usuario.save()
+    console.log(respMongo)
+    //4. respondo ao cliente que deu tudo certo
+    res.status(201).end()
+  }
+  catch (erro){
+    console.log('erro', erro)
+    res.status(409).end()
+  }
 })
 
 //127.0.0.1:3000
