@@ -1,9 +1,25 @@
-//mongodb+srv://professorbossini:<password>@cluster0.wttmkyk.mongodb.net/?retryWrites=true&w=majority
+require('dotenv').config()
 const bcrypt= require ('bcrypt')
 const cors = require('cors')
 const express = require('express')
+const jwt = require ('jsonwebtoken')
 const mongoose = require ('mongoose')
 const uniqueValidator = require ('mongoose-unique-validator')
+
+// const MONGODB_USER = process.env.MONGODB_USER
+// const MONGODB_PASSWORD = process.env.MONGODB_PASSWORD
+// const MONGODB_CLUSTER = process.env.MONGODB_CLUSTER
+// const MONGODB_HOST = process.env.MONGODB_HOST
+
+//operador de desestruturação do JS
+const {
+  MONGODB_USER,
+  MONGODB_PASSWORD,
+  MONGODB_CLUSTER,
+  MONGODB_HOST,
+  JWT_PASSWORD
+} = process.env
+
 const app = express()
 app.use(express.json())
 //aqui vamos aplicar um "middleware" que "libera" o CORS
@@ -26,8 +42,10 @@ const Usuario = mongoose.model('Usuario', usuarioSchema)
 
 //essa função vai ser usada para estabelecer uma conexão entre o Back End (NodeJS) e o MongoDB
 async function conectarAoMongoDB(){
-  await mongoose.connect('mongodb+srv://professorbossini:professorbossini@cluster0.wttmkyk.mongodb.net/?retryWrites=true&w=majority')
+  await mongoose.connect(`mongodb+srv://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_CLUSTER}.${MONGODB_HOST}.mongodb.net/?retryWrites=true&w=majority`)
 }
+
+//dotenv: .env
 
 //endpoint
 //localhost:3000/hey
@@ -91,6 +109,38 @@ app.post('/signup', async (req, res) => {
   catch (erro){
     console.log('erro', erro)
     res.status(409).end()
+  }
+})
+//github copilot
+
+//bearer: detentor
+//POST localhost:3000/login
+app.post('/login', async (req, res) => {
+  //1. pegar o login da requisição
+  const login = req.body.login
+  //2. pegar a senha da requisição
+  const password = req.body.password
+  //3. consultar o MongoDB a fim de verificar se esse usuário existe
+  const u = await Usuario.findOne({login: login})
+  //4. se existir, verificar se a senha está correta (lembrar que ela está criptografada)
+  //5. se o usuário não existir ou se a senha for inválida, devolver status 401
+  //6 se o usuário existir e a senha for válida, devolver 200 OK
+  if(!u){
+    res.status(401).json({mensagem: "login inválido"})
+  }
+  else{
+    const senhaValida = await bcrypt.compare(password, u.password)
+    if (senhaValida){
+      const token = jwt.sign(
+        {login: login},
+        `${JWT_PASSWORD}`,
+        {expiresIn: '1h'}
+      )
+      res.status(200).json({mensagem: "bem vindo", token})
+    }
+    else{
+      res.status(401).json({mensagem: "senha inválida"})
+    }
   }
 })
 

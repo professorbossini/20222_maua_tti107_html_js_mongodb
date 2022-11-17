@@ -66,3 +66,19 @@ async function cadastrarFilme(){
     }, 2000)
   }
 }
+
+
+const cadastrarUsuario = async () => {
+  const usuarioCadastroInput = 
+    document.querySelector('#usuarioCadastroInput')
+  const passwordCadastroInput =
+    document.querySelector('#passwordCadastroInput')
+  const usuarioCadastro = usuarioCadastroInput.value
+  const passwordCadastro = passwordCadastroInput.value
+  if (usuarioCadastro && passwordCadastro){
+
+  }
+  else{
+    
+  }
+}
